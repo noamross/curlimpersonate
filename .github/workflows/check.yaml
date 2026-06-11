@@ -1,0 +1,67 @@
+name: check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+
+    env:
+      # Avoid GitHub API rate limits when downloading libcurl-impersonate.
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      # Turn on the (network + compile) integration test.
+      CURLIMPERSONATE_TEST_INTEGRATION: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::jsonlite
+            any::curl
+            any::httr2
+            any::testthat
+            any::withr
+            any::pkgload
+          needs: check
+
+      - name: Install package
+        run: R CMD INSTALL .
+
+      - name: Run tests (unit + integration)
+        run: Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
+
+      - name: Fresh-process check — curl uses libcurl-impersonate (BoringSSL)
+        shell: bash
+        run: |
+          RLIB="$(Rscript -e 'cat(tools::R_user_dir("curlimpersonate","data"))')/rlib"
+          echo "Private library: $RLIB"
+          R_LIBS="$RLIB" Rscript -e '
+            v <- curl::curl_version()
+            cat("libcurl:", v$version, "| ssl:", v$ssl_version, "\n")
+            stopifnot(grepl("IMPERSONATE|BoringSSL", paste(v$version, v$ssl_version)))
+          '
+
+      - name: Fresh-process check — fingerprint changes under a profile (best-effort)
+        continue-on-error: true
+        shell: bash
+        run: |
+          RLIB="$(Rscript -e 'cat(tools::R_user_dir("curlimpersonate","data"))')/rlib"
+          R_LIBS="$RLIB" CURL_IMPERSONATE=chrome116 CURL_IMPERSONATE_HEADERS=yes Rscript -e '
+            j <- jsonlite::fromJSON(rawToChar(curl::curl_fetch_memory("https://tls.peet.ws/api/all")$content))
+            cat("JA4 (chrome116):", j$tls$ja4, "\n")
+            stopifnot(startsWith(j$tls$ja4, "t13d"))
+          '

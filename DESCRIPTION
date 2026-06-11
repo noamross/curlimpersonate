@@ -1,0 +1,31 @@
+Package: curlimpersonate
+Title: Use 'curl-impersonate' as the Backend for 'curl', 'httr', and 'httr2'
+Version: 0.0.0.9000
+Authors@R:
+    person("Noam", "Ross", , "noam@raft.foundation", role = c("aut", "cre"))
+Description: Makes R HTTP requests carry a real browser's TLS (JA3/JA4) and
+    HTTP/2 fingerprint by installing a build of the 'curl' package linked
+    against 'libcurl-impersonate'. Downloads prebuilt 'libcurl-impersonate'
+    binaries into a user cache (or uses a local install via the
+    'CURLIMPERSONATE_HOME' environment variable), rebuilds the 'curl' package
+    into a private library, and provides helpers to activate that library and
+    switch the impersonation profile per session. Because 'curl', 'httr', and
+    'httr2' all route through the 'curl' package, the swap applies to
+    everything downstream.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    jsonlite,
+    tools,
+    utils
+Suggests:
+    curl,
+    httr2,
+    testthat (>= 3.0.0),
+    withr
+SystemRequirements: pkg-config and a C toolchain (used to rebuild the 'curl'
+    package against libcurl-impersonate)
+URL: https://github.com/noamross/curlimpersonate
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
