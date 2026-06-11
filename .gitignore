@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.DS_Store
+.Renviron
+.vscode/
+doc/
+/Meta/
+.positai/*
+.agents/*
+NOTES.md
+.claude/worktrees/*
+agent-*/*
+*/agent-*/*
+docs
+*.tar.gz

@@ -1,0 +1,9 @@
+^\.github$
+^\.agents$
+^\.Rproj\.user$
+^.*\.Rproj$
+^.*\.Rcheck$
+^curlimpersonate.*\.tar\.gz$
+^LICENSE\.md$
+^\.vscode$
+^\.claude$

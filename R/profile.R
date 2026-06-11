@@ -10,7 +10,7 @@
   "chrome116", "chrome119", "chrome120", "chrome123", "chrome124", "chrome131",
   "chrome99_android", "edge99", "edge101",
   "safari15_3", "safari15_5", "safari17_0", "safari17_2_ios", "safari18_0",
-  "firefox117", "firefox133"
+  "firefox133", "firefox135"
 )
 
 #' List impersonation profiles

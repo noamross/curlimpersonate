@@ -4,9 +4,6 @@ Make R HTTP requests carry a real browser's TLS (JA3/JA4) and HTTP/2
 fingerprint, using [`libcurl-impersonate`](https://github.com/lexiforest/curl-impersonate)
 as the libcurl behind R's HTTP stack.
 
-> Not on CRAN (it rebuilds another package and downloads native binaries).
-> Install from GitHub / r-universe.
-
 ## Three different "curls"
 
 It matters which one your request uses, because curlimpersonate only affects
@@ -134,6 +131,27 @@ manage headers entirely yourself. See `?impersonate_set` for details.
   `lexiforest/curl-impersonate`).
 - `CURL_IMPERSONATE` / `CURL_IMPERSONATE_HEADERS` — the underlying library's own
   knobs, managed by `impersonate_set()`.
+
+## Supported builds (lexiforest, not the lwthiker original)
+
+curl-impersonate exists in two lineages, and they are not equivalent:
+
+- **`lexiforest/curl-impersonate`** (the default here): a **single**
+  `libcurl-impersonate` that statically embeds BoringSSL and impersonates
+  Chrome, Edge, Safari **and** Firefox from one library — no NSS, no separate
+  CA-certificate install, and arm64 macOS builds. Verified: the downloaded
+  dylib has no dynamic NSS/SSL dependency.
+- **`lwthiker/curl-impersonate`** (the original): **two** libraries —
+  `libcurl-impersonate-chrome` (BoringSSL) and `libcurl-impersonate-ff` (NSS).
+  The Firefox build needs system NSS (`libnss3`, `nss-plugin-pem`) and CA
+  certificates, ships Intel-only macOS binaries, and is largely unmaintained.
+
+This package targets the lexiforest single-library design — that's how it
+avoids the two-version + NSS complications entirely. If you point it at an
+lwthiker-style install (two `-chrome`/`-ff` libraries, or an NSS-linked
+library), it stops with an explanatory error rather than silently building
+against one variant. A single BoringSSL library (lexiforest, or a chrome-only
+lwthiker build) is fine.
 
 ## Building libcurl-impersonate yourself
 

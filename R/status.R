@@ -37,7 +37,7 @@ print.impersonate_status <- function(x, ...) {
   yn <- function(v) if (isTRUE(v)) "yes" else "no"
   cat("<curlimpersonate status>\n")
   cat("  cache home      :", x$home, "\n")
-  cat("  impersonate lib :", x$library %||% "<none — run download_impersonate()>", "\n")
+  cat("  impersonate lib :", x$library %||% "<none - run download_impersonate()>", "\n")
   cat("  private curl    :", yn(x$installed), "(", x$rlib, ")\n")
   cat("  active now      :", yn(x$active),
     if (!is.na(x$curl_loaded_from)) paste0("(curl loaded from ", x$curl_loaded_from, ")") else "", "\n")

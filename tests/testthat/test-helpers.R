@@ -66,3 +66,19 @@ test_that("impersonate_env emits the right loader var per OS", {
 test_that("impersonate_env errors without a library", {
   expect_error(impersonate_env(lib = NULL), "No libcurl-impersonate")
 })
+
+test_that("guard rejects an lwthiker-style two-library install", {
+  d <- file.path(tempdir(), "cimp-guard-two")
+  unlink(d, recursive = TRUE)
+  dir.create(d)
+  file.create(file.path(d, c("libcurl-impersonate-chrome.4.dylib", "libcurl-impersonate-ff.4.dylib")))
+  expect_error(curlimpersonate:::.assert_supported_lib(d), "two-library|lwthiker|single-library")
+})
+
+test_that("guard accepts a single lexiforest-style library", {
+  d <- file.path(tempdir(), "cimp-guard-one")
+  unlink(d, recursive = TRUE)
+  dir.create(d)
+  file.create(file.path(d, "libcurl-impersonate.4.dylib"))
+  expect_invisible(curlimpersonate:::.assert_supported_lib(d))
+})

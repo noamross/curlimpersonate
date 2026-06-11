@@ -129,6 +129,46 @@ impersonate_home <- function() {
   if (length(cand)) cand[1] else NULL
 }
 
+# Guard: this package targets the single-library lexiforest fork (one BoringSSL
+# libcurl-impersonate for all browsers, no NSS). Reject the original
+# lwthiker-style build, which ships separate -chrome/-ff libraries and whose
+# Firefox build links system NSS and needs CA certificates.
+.assert_supported_lib <- function(libdir = .lib_dir()) {
+  if (!dir.exists(libdir)) {
+    return(invisible(TRUE))
+  }
+  libs <- list.files(
+    libdir,
+    pattern = "libcurl-impersonate.*\\.(dylib|dll)$|libcurl-impersonate.*\\.so(\\.[0-9]+)*$"
+  )
+  if (!length(libs)) {
+    return(invisible(TRUE))
+  }
+  has_chrome <- any(grepl("impersonate-chrome", libs))
+  has_ff <- any(grepl("impersonate-(ff|firefox)", libs))
+  if (has_chrome && has_ff) {
+    stop(
+      "Found separate '-chrome' and '-ff' libraries in ", libdir, ".\n",
+      "This is the original lwthiker/curl-impersonate two-library build. ",
+      "curlimpersonate targets the single-library lexiforest fork (one ",
+      "BoringSSL libcurl-impersonate for all browsers, no NSS). Use a ",
+      "lexiforest build, or point CURLIMPERSONATE_HOME at a directory ",
+      "containing only one library.",
+      call. = FALSE
+    )
+  }
+  lib <- .find_impersonate_lib(libdir)
+  if (!is.null(lib) && any(grepl("\\bnss|libnss", .so_deps(lib), ignore.case = TRUE))) {
+    stop(
+      "The libcurl-impersonate in ", libdir, " dynamically links NSS, i.e. the ",
+      "lwthiker Firefox build, which requires system NSS + CA certificates and ",
+      "is not supported here. Use the lexiforest fork (BoringSSL, no NSS).",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
+
 # Prebuilt macOS dylibs often carry an absolute install name (LC_ID_DYLIB) from
 # the machine they were built on (e.g. /Users/runner/work/...). curl.so would
 # then record that non-existent path and fail to load. Rewrite each

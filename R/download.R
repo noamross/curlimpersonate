@@ -123,6 +123,7 @@ download_impersonate <- function(version = "latest",
   }
 
   out <- .collect_artifacts(ex)
+  .assert_supported_lib(out)
   if (!quiet) {
     message("Installed libcurl-impersonate into ", out)
     message("Next: build_impersonate_curl()  (or install_impersonate() to do both)")

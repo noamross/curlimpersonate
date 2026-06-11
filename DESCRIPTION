@@ -2,7 +2,7 @@ Package: curlimpersonate
 Title: Use 'curl-impersonate' as the Backend for 'curl', 'httr', and 'httr2'
 Version: 0.0.0.9000
 Authors@R:
-    person("Noam", "Ross", , "noam@raft.foundation", role = c("aut", "cre"))
+    person("Noam", "Ross", , "noam.ross@gmail.com", role = c("aut", "cre"))
 Description: Makes R HTTP requests carry a real browser's TLS (JA3/JA4) and
     HTTP/2 fingerprint by installing a build of the 'curl' package linked
     against 'libcurl-impersonate'. Downloads prebuilt 'libcurl-impersonate'

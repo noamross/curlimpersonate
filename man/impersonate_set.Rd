@@ -27,7 +27,7 @@ mechanism); on a stock \code{curl} package it does nothing.
 }
 \details{
 Profiles available in this package's bundled list:
-chrome100, chrome101, chrome104, chrome107, chrome110, chrome116, chrome119, chrome120, chrome123, chrome124, chrome131, chrome99, chrome99_android, edge101, edge99, firefox117, firefox133, safari15_3, safari15_5, safari17_0, safari17_2_ios, safari18_0.
+chrome100, chrome101, chrome104, chrome107, chrome110, chrome116, chrome119, chrome120, chrome123, chrome124, chrome131, chrome99, chrome99_android, edge101, edge99, firefox133, firefox135, safari15_3, safari15_5, safari17_0, safari17_2_ios, safari18_0.
 This list is informational and not exhaustive — any target your
 libcurl-impersonate build supports will work even if it is not listed.
 }

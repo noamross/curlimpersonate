@@ -5,28 +5,53 @@ on:
     branches: [main, master]
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Mondays 06:00 UTC — weekly run on main to catch breaking changes in the
+    # upstream curl-impersonate releases / fingerprint behaviour.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
-  check:
+  # Packaging + unit tests (integration disabled here).
+  R-CMD-check:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
-
     env:
-      # Avoid GitHub API rate limits when downloading libcurl-impersonate.
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      # Turn on the (network + compile) integration test.
-      CURLIMPERSONATE_TEST_INTEGRATION: "true"
-
+      R_KEEP_PKG_SOURCE: yes
     steps:
       - uses: actions/checkout@v4
-
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+      - uses: r-lib/actions/check-r-package@v2
 
+  # Real download + rebuild + live requests. On Linux we additionally exercise
+  # the no-rebuild preload path. Also runs weekly via the schedule above.
+  live:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CURLIMPERSONATE_TEST_INTEGRATION: "true"
+      NOT_CRAN: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
@@ -35,33 +60,32 @@ jobs:
             any::httr2
             any::testthat
             any::withr
-            any::pkgload
           needs: check
-
       - name: Install package
         run: R CMD INSTALL .
 
-      - name: Run tests (unit + integration)
+      # Rebuild path: download libcurl-impersonate, rebuild curl, and confirm the
+      # server-seen fingerprint changes across all profiles (test-integration.R).
+      - name: Rebuild path — integration tests across all profiles
         run: Rscript -e 'testthat::test_dir("tests/testthat", stop_on_failure = TRUE)'
 
-      - name: Fresh-process check — curl uses libcurl-impersonate (BoringSSL)
+      # Preload path: no rebuild. LD_PRELOAD libcurl-impersonate into the stock,
+      # dynamically linked curl and confirm the fingerprint changes. Linux only —
+      # the macOS CRAN curl is statically linked, so preload cannot work there.
+      - name: Preload path (Linux) — LD_PRELOAD the existing curl, no rebuild
+        if: runner.os == 'Linux'
         shell: bash
         run: |
-          RLIB="$(Rscript -e 'cat(tools::R_user_dir("curlimpersonate","data"))')/rlib"
-          echo "Private library: $RLIB"
-          R_LIBS="$RLIB" Rscript -e '
-            v <- curl::curl_version()
-            cat("libcurl:", v$version, "| ssl:", v$ssl_version, "\n")
-            stopifnot(grepl("IMPERSONATE|BoringSSL", paste(v$version, v$ssl_version)))
-          '
-
-      - name: Fresh-process check — fingerprint changes under a profile (best-effort)
-        continue-on-error: true
-        shell: bash
-        run: |
-          RLIB="$(Rscript -e 'cat(tools::R_user_dir("curlimpersonate","data"))')/rlib"
-          R_LIBS="$RLIB" CURL_IMPERSONATE=chrome116 CURL_IMPERSONATE_HEADERS=yes Rscript -e '
-            j <- jsonlite::fromJSON(rawToChar(curl::curl_fetch_memory("https://tls.peet.ws/api/all")$content))
-            cat("JA4 (chrome116):", j$tls$ja4, "\n")
-            stopifnot(startsWith(j$tls$ja4, "t13d"))
-          '
+          set -euo pipefail
+          LIB="$(Rscript -e 'cat(curlimpersonate::impersonate_lib())')"
+          echo "impersonate lib: $LIB"
+          # Precondition: the stock curl must be dynamically linked.
+          Rscript -e 'stopifnot(identical(curlimpersonate::impersonate_linkage()$linkage, "dynamic"))'
+          fetch='cat(jsonlite::fromJSON(rawToChar(curl::curl_fetch_memory("https://tls.peet.ws/api/all")$content))$tls$ja4)'
+          BASE="$(Rscript -e "$fetch")"
+          IMP="$(LD_PRELOAD="$LIB" CURL_IMPERSONATE=chrome116 CURL_IMPERSONATE_HEADERS=yes Rscript -e "$fetch")"
+          echo "baseline JA4:  $BASE"
+          echo "preloaded JA4: $IMP"
+          test -n "$IMP" && [ "$BASE" != "$IMP" ]
+          echo "$IMP" | grep -Eq '^t1[0-9]d'
+          echo "Preload OK: stock curl + LD_PRELOAD changed the fingerprint without a rebuild."

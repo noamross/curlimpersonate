@@ -35,6 +35,7 @@ build_impersonate_curl <- function(repos = "https://cloud.r-project.org", quiet 
       call. = FALSE
     )
   }
+  .assert_supported_lib(.lib_dir())
   # Ensure macOS install names resolve (prebuilt dylibs carry a foreign path).
   if (isFALSE(.macos_fix_install_names(dirname(lib)))) {
     warning(
