@@ -23,3 +23,10 @@ A character vector of profile names.
 \description{
 List impersonation profiles
 }
+\examples{
+# All profiles: bundled list unioned with any wrapper binaries in the install
+impersonate_profiles()
+
+# Just the static list shipped with this package
+impersonate_profiles(source = "bundled")
+}

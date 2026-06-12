@@ -32,3 +32,10 @@ redirect it (it \emph{can} affect \code{\link[=download.file]{download.file()}} 
 which uses a dynamically linked libcurl). \code{\link[=impersonate_env]{impersonate_env()}} warns when it
 detects this.
 }
+\examples{
+\dontrun{
+  # After download_impersonate() on a system where curl links libcurl dynamically:
+  impersonate_env("chrome131")
+  # Copy the printed export lines into your shell/launcher, then restart R
+}
+}

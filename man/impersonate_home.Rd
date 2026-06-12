@@ -16,3 +16,7 @@ set, it is used verbatim (point it at an existing install to skip
 downloading). Otherwise the managed cache under
 \code{\link[tools:R_user_dir]{tools::R_user_dir()}} is used.
 }
+\examples{
+# The managed cache directory (or CURLIMPERSONATE_HOME if set)
+impersonate_home()
+}

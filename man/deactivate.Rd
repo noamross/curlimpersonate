@@ -13,3 +13,11 @@ deactivate()
 Reverses \code{\link[=activate]{activate()}} for the current session. Does not unload an
 already-loaded \code{curl}; restart R for a clean revert.
 }
+\examples{
+\dontrun{
+  activate()
+  library(curl)
+  # ... make impersonated requests ...
+  deactivate()  # remove the private library; restart R for a fully clean state
+}
+}

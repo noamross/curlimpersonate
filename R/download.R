@@ -91,6 +91,14 @@
 #' @param os,arch Platform identifiers; auto-detected by default.
 #' @param quiet Suppress progress messages.
 #' @return The directory the library was written to (invisibly).
+#' @examples
+#' \dontrun{
+#'   download_impersonate()                    # latest release for your OS/arch
+#'   download_impersonate(version = "v0.8.0")  # pin a specific release tag
+#'
+#'   # Skip downloading by pointing at an existing install instead:
+#'   # Sys.setenv(CURLIMPERSONATE_HOME = "/opt/curl-impersonate")
+#' }
 #' @export
 download_impersonate <- function(version = "latest",
                                  repo = getOption("curlimpersonate.repo", "lexiforest/curl-impersonate"),

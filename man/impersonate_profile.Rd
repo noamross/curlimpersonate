@@ -12,3 +12,9 @@ The profile string, or \code{NA} if impersonation is off.
 \description{
 The currently selected impersonation profile
 }
+\examples{
+impersonate_set("firefox133")
+impersonate_profile()  # "firefox133"
+impersonate_clear()
+impersonate_profile()  # NA
+}

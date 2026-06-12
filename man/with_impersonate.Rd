@@ -20,3 +20,25 @@ The value of \code{code}.
 Sets the profile, evaluates \code{code}, and restores the previous environment on
 exit (whether or not \code{code} errors).
 }
+\examples{
+# Scoped profile: "chrome131" inside the block, previous profile restored after
+impersonate_set("firefox133")
+with_impersonate("chrome131", {
+  impersonate_profile()  # "chrome131" inside the block
+})
+impersonate_profile()  # back to "firefox133"
+impersonate_clear()
+
+\dontrun{
+  # Hit tls.peet.ws to confirm the fingerprint matches the profile:
+  with_impersonate("chrome131", {
+    chk <- impersonate_check()
+    chk$ja4  # Chrome's JA4: t13d1516h2_...
+  })
+
+  # Compare Chrome vs Firefox fingerprints side by side:
+  chrome_ja4  <- with_impersonate("chrome131",  impersonate_check()$ja4)
+  firefox_ja4 <- with_impersonate("firefox133", impersonate_check()$ja4)
+  identical(chrome_ja4, firefox_ja4)  # FALSE — different TLS fingerprints
+}
+}

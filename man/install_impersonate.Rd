@@ -19,3 +19,13 @@ Convenience wrapper: \code{\link[=download_impersonate]{download_impersonate()}}
 present or \code{CURLIMPERSONATE_HOME} is set) followed by
 \code{\link[=build_impersonate_curl]{build_impersonate_curl()}}.
 }
+\examples{
+\dontrun{
+  install_impersonate()   # download + rebuild in one step
+  activate()              # prepend private library (before curl loads)
+  library(httr2)
+  impersonate_set("chrome131")
+  chk <- impersonate_check()
+  chk$ja4  # Chrome's JA4: t13d1516h2_...
+}
+}

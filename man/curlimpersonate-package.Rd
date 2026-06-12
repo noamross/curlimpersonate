@@ -86,11 +86,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Noam Ross \email{noam@raft.foundation}
+\strong{Maintainer}: Noam Ross \email{noam.ross@gmail.com}
 
 Authors:
 \itemize{
-  \item Noam Ross \email{noam@raft.foundation}
+  \item Noam Ross \email{noam.ross@gmail.com}
 }
 
 }

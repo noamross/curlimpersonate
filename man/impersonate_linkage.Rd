@@ -21,3 +21,10 @@ loaded and reports whether it links libcurl \strong{statically} or \strong{dynam
 — which determines whether you can use the preload mechanism
 (\code{\link[=impersonate_env]{impersonate_env()}}) or must rebuild (\code{\link[=build_impersonate_curl]{build_impersonate_curl()}}).
 }
+\examples{
+# Inspect how the curl package links libcurl to choose the right mechanism
+lnk <- impersonate_linkage()
+lnk
+# "dynamic" -> use impersonate_env() (no rebuild needed)
+# "static"  -> use build_impersonate_curl()
+}

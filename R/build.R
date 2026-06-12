@@ -24,6 +24,14 @@
 #' @param repos CRAN mirror to fetch the `curl` source from.
 #' @param quiet Suppress messages.
 #' @return The private library path (invisibly).
+#' @examples
+#' \dontrun{
+#'   # After download_impersonate():
+#'   build_impersonate_curl()
+#'   activate()
+#'   impersonate_set("chrome131")
+#'   impersonate_check()
+#' }
 #' @export
 build_impersonate_curl <- function(repos = "https://cloud.r-project.org", quiet = FALSE) {
   lib <- .find_impersonate_lib(.lib_dir())
@@ -121,6 +129,15 @@ build_impersonate_curl <- function(repos = "https://cloud.r-project.org", quiet 
 #' @param ... Passed to [download_impersonate()].
 #' @param quiet Suppress messages.
 #' @return The private library path (invisibly).
+#' @examples
+#' \dontrun{
+#'   install_impersonate()   # download + rebuild in one step
+#'   activate()              # prepend private library (before curl loads)
+#'   library(httr2)
+#'   impersonate_set("chrome131")
+#'   chk <- impersonate_check()
+#'   chk$ja4  # Chrome's JA4: t13d1516h2_...
+#' }
 #' @export
 install_impersonate <- function(..., quiet = FALSE) {
   have_lib <- !is.null(.find_impersonate_lib(.lib_dir()))

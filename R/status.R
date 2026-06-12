@@ -6,6 +6,9 @@
 #'   detected library, whether the private curl is installed and currently
 #'   active, how the active `curl` package links libcurl, the SSL backend
 #'   `curl` reports, and the active profile.
+#' @examples
+#' # Overview of cache, build, linkage, and active profile
+#' impersonate_status()
 #' @export
 impersonate_status <- function() {
   rlib <- .rlib_dir()
@@ -67,6 +70,27 @@ print.impersonate_status <- function(x, ...) {
 #'
 #' @param url A reflector returning JSON. Defaults to `https://tls.peet.ws/api/all`.
 #' @return An `impersonate_check` object (a list of fingerprints).
+#' @examples
+#' \dontrun{
+#'   # Vanilla curl fingerprint (no impersonation) — shows your baseline:
+#'   chk_plain <- impersonate_check()
+#'   chk_plain
+#'
+#'   # With Chrome impersonation active (after activate() + impersonate_set()):
+#'   impersonate_set("chrome131")
+#'   chk_chrome <- impersonate_check()
+#'   chk_chrome$ja4      # Chrome's JA4: t13d1516h2_...
+#'   chk_chrome$ja3_hash # Chrome's JA3 hash
+#'
+#'   # Firefox has a distinct fingerprint from Chrome:
+#'   impersonate_set("firefox133")
+#'   chk_ff <- impersonate_check()
+#'   chk_ff$ja4  # different ciphers/extensions → different hash
+#'
+#'   # Impersonation is working when the fingerprint changes:
+#'   identical(chk_plain$ja4, chk_chrome$ja4)  # FALSE
+#'   impersonate_clear()
+#' }
 #' @export
 impersonate_check <- function(url = "https://tls.peet.ws/api/all") {
   if (!requireNamespace("curl", quietly = TRUE)) {

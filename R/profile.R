@@ -23,6 +23,12 @@
 #'     download contained only the library.
 #'   * `"bundled"`: only the static list shipped with this package.
 #' @return A character vector of profile names.
+#' @examples
+#' # All profiles: bundled list unioned with any wrapper binaries in the install
+#' impersonate_profiles()
+#'
+#' # Just the static list shipped with this package
+#' impersonate_profiles(source = "bundled")
 #' @export
 impersonate_profiles <- function(source = c("auto", "installed", "bundled")) {
   source <- match.arg(source)
@@ -85,6 +91,18 @@ impersonate_profiles <- function(source = c("auto", "installed", "bundled")) {
 #'   default headers and ordering (`CURL_IMPERSONATE_HEADERS`). See the Headers
 #'   section.
 #' @return `profile` invisibly.
+#' @examples
+#' # Sets CURL_IMPERSONATE env var; takes effect when libcurl-impersonate is active
+#' impersonate_set("chrome131")
+#' impersonate_profile()  # "chrome131"
+#'
+#' \dontrun{
+#'   # Confirm the fingerprint at tls.peet.ws matches Chrome's:
+#'   chk <- impersonate_check()
+#'   chk$ja4  # Chrome's JA4: t13d1516h2_...
+#' }
+#'
+#' impersonate_clear()
 #' @export
 impersonate_set <- function(profile, headers = TRUE) {
   stopifnot(is.character(profile), length(profile) == 1L, nzchar(profile))
@@ -98,6 +116,11 @@ impersonate_set <- function(profile, headers = TRUE) {
 #' Unsets the impersonation environment variables. The (still
 #' impersonate-capable) libcurl then behaves like ordinary libcurl.
 #' @return `TRUE` invisibly.
+#' @examples
+#' impersonate_set("chrome131")
+#' impersonate_profile()  # "chrome131"
+#' impersonate_clear()
+#' impersonate_profile()  # NA
 #' @export
 impersonate_clear <- function() {
   Sys.unsetenv(c("CURL_IMPERSONATE", "CURL_IMPERSONATE_HEADERS"))
@@ -106,6 +129,11 @@ impersonate_clear <- function() {
 
 #' The currently selected impersonation profile
 #' @return The profile string, or `NA` if impersonation is off.
+#' @examples
+#' impersonate_set("firefox133")
+#' impersonate_profile()  # "firefox133"
+#' impersonate_clear()
+#' impersonate_profile()  # NA
 #' @export
 impersonate_profile <- function() {
   v <- Sys.getenv("CURL_IMPERSONATE", unset = "")
@@ -121,6 +149,27 @@ impersonate_profile <- function() {
 #' @param code Code to evaluate.
 #' @param headers Passed to [impersonate_set()].
 #' @return The value of `code`.
+#' @examples
+#' # Scoped profile: "chrome131" inside the block, previous profile restored after
+#' impersonate_set("firefox133")
+#' with_impersonate("chrome131", {
+#'   impersonate_profile()  # "chrome131" inside the block
+#' })
+#' impersonate_profile()  # back to "firefox133"
+#' impersonate_clear()
+#'
+#' \dontrun{
+#'   # Hit tls.peet.ws to confirm the fingerprint matches the profile:
+#'   with_impersonate("chrome131", {
+#'     chk <- impersonate_check()
+#'     chk$ja4  # Chrome's JA4: t13d1516h2_...
+#'   })
+#'
+#'   # Compare Chrome vs Firefox fingerprints side by side:
+#'   chrome_ja4  <- with_impersonate("chrome131",  impersonate_check()$ja4)
+#'   firefox_ja4 <- with_impersonate("firefox133", impersonate_check()$ja4)
+#'   identical(chrome_ja4, firefox_ja4)  # FALSE — different TLS fingerprints
+#' }
 #' @export
 with_impersonate <- function(profile, code, headers = TRUE) {
   old <- Sys.getenv("CURL_IMPERSONATE", unset = NA)

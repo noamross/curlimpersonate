@@ -32,3 +32,12 @@ unpacks the shared library (and headers, if bundled) into
 \code{tools::R_user_dir("curlimpersonate", "data")}. Skip this entirely by
 setting \code{CURLIMPERSONATE_HOME} to an existing install.
 }
+\examples{
+\dontrun{
+  download_impersonate()                    # latest release for your OS/arch
+  download_impersonate(version = "v0.8.0")  # pin a specific release tag
+
+  # Skip downloading by pointing at an existing install instead:
+  # Sys.setenv(CURLIMPERSONATE_HOME = "/opt/curl-impersonate")
+}
+}

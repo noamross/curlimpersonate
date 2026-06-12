@@ -58,3 +58,16 @@ possible yourself, and verify the result with \code{\link[=impersonate_check]{im
 are the expected mechanics of libcurl-impersonate; confirm against your build.)
 }
 
+\examples{
+# Sets CURL_IMPERSONATE env var; takes effect when libcurl-impersonate is active
+impersonate_set("chrome131")
+impersonate_profile()  # "chrome131"
+
+\dontrun{
+  # Confirm the fingerprint at tls.peet.ws matches Chrome's:
+  chk <- impersonate_check()
+  chk$ja4  # Chrome's JA4: t13d1516h2_...
+}
+
+impersonate_clear()
+}

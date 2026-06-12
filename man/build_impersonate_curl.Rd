@@ -19,3 +19,12 @@ Compiles the CRAN \code{curl} package from source, linking it against the
 libcurl-impersonate found via \code{\link[=impersonate_home]{impersonate_home()}}, and installs it into a
 private library (\verb{<cache>/rlib}). Your system/user \code{curl} is left untouched.
 }
+\examples{
+\dontrun{
+  # After download_impersonate():
+  build_impersonate_curl()
+  activate()
+  impersonate_set("chrome131")
+  impersonate_check()
+}
+}

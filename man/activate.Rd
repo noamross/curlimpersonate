@@ -32,3 +32,13 @@ path):
 \if{html}{\out{<div class="sourceCode">}}\preformatted{R_LIBS=/path/to/curlimpersonate/rlib
 }\if{html}{\out{</div>}}
 }
+\examples{
+\dontrun{
+  # Call activate() before any library() that loads the curl package:
+  activate()
+  library(httr2)
+  impersonate_set("chrome131")
+  chk <- impersonate_check()  # JA4 should now match Chrome's fingerprint
+  chk$ja4
+}
+}

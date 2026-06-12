@@ -12,6 +12,9 @@
 #' [tools::R_user_dir()] is used.
 #'
 #' @return A file path (character scalar).
+#' @examples
+#' # The managed cache directory (or CURLIMPERSONATE_HOME if set)
+#' impersonate_home()
 #' @export
 impersonate_home <- function() {
   env <- Sys.getenv("CURLIMPERSONATE_HOME", unset = "")

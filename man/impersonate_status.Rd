@@ -15,3 +15,7 @@ active, how the active \code{curl} package links libcurl, the SSL backend
 \description{
 Report curlimpersonate's state
 }
+\examples{
+# Overview of cache, build, linkage, and active profile
+impersonate_status()
+}

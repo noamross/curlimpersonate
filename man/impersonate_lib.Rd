@@ -14,3 +14,7 @@ Returns the libcurl-impersonate library found under \code{\link[=impersonate_hom
 (either downloaded by \code{\link[=download_impersonate]{download_impersonate()}} or supplied via
 \code{CURLIMPERSONATE_HOME}).
 }
+\examples{
+# NULL before download_impersonate() has been run; a file path after
+impersonate_lib()
+}

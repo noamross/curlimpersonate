@@ -7,6 +7,9 @@
 #' `CURLIMPERSONATE_HOME`).
 #'
 #' @return A file path, or `NULL` if none is present.
+#' @examples
+#' # NULL before download_impersonate() has been run; a file path after
+#' impersonate_lib()
 #' @export
 impersonate_lib <- function() {
   .find_impersonate_lib(.lib_dir())
@@ -24,6 +27,12 @@ impersonate_lib <- function() {
 #' @return An `impersonate_linkage` object: the inspected object, `linkage`
 #'   (`"dynamic"`, `"static"`, or `NA` on Windows), the dynamic libcurl
 #'   dependency if any, and whether it already points at libcurl-impersonate.
+#' @examples
+#' # Inspect how the curl package links libcurl to choose the right mechanism
+#' lnk <- impersonate_linkage()
+#' lnk
+#' # "dynamic" -> use impersonate_env() (no rebuild needed)
+#' # "static"  -> use build_impersonate_curl()
 #' @export
 impersonate_linkage <- function(so = .active_curl_so()) {
   os <- .detect_os()
@@ -88,6 +97,12 @@ print.impersonate_linkage <- function(x, ...) {
 #'   [impersonate_lib()].
 #' @return A named character vector of environment variables, with class
 #'   `impersonate_env` for pretty printing.
+#' @examples
+#' \dontrun{
+#'   # After download_impersonate() on a system where curl links libcurl dynamically:
+#'   impersonate_env("chrome131")
+#'   # Copy the printed export lines into your shell/launcher, then restart R
+#' }
 #' @export
 impersonate_env <- function(profile = NULL, lib = impersonate_lib()) {
   if (is.null(lib)) {

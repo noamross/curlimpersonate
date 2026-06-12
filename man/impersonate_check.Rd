@@ -17,3 +17,25 @@ Makes a request through \code{curl} to a fingerprint-reflecting endpoint and
 returns the JA3/JA4 and HTTP/2 fingerprints the server observed. Compare
 with impersonation on vs. off to confirm it is working.
 }
+\examples{
+\dontrun{
+  # Vanilla curl fingerprint (no impersonation) — shows your baseline:
+  chk_plain <- impersonate_check()
+  chk_plain
+
+  # With Chrome impersonation active (after activate() + impersonate_set()):
+  impersonate_set("chrome131")
+  chk_chrome <- impersonate_check()
+  chk_chrome$ja4      # Chrome's JA4: t13d1516h2_...
+  chk_chrome$ja3_hash # Chrome's JA3 hash
+
+  # Firefox has a distinct fingerprint from Chrome:
+  impersonate_set("firefox133")
+  chk_ff <- impersonate_check()
+  chk_ff$ja4  # different ciphers/extensions → different hash
+
+  # Impersonation is working when the fingerprint changes:
+  identical(chk_plain$ja4, chk_chrome$ja4)  # FALSE
+  impersonate_clear()
+}
+}

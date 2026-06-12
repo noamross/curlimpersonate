@@ -13,3 +13,9 @@ impersonate_clear()
 Unsets the impersonation environment variables. The (still
 impersonate-capable) libcurl then behaves like ordinary libcurl.
 }
+\examples{
+impersonate_set("chrome131")
+impersonate_profile()  # "chrome131"
+impersonate_clear()
+impersonate_profile()  # NA
+}

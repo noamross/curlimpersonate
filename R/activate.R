@@ -34,6 +34,15 @@
 #' ```
 #'
 #' @return The activated library path (invisibly).
+#' @examples
+#' \dontrun{
+#'   # Call activate() before any library() that loads the curl package:
+#'   activate()
+#'   library(httr2)
+#'   impersonate_set("chrome131")
+#'   chk <- impersonate_check()  # JA4 should now match Chrome's fingerprint
+#'   chk$ja4
+#' }
 #' @export
 activate <- function() {
   rlib <- .rlib_dir()
@@ -63,6 +72,13 @@ activate <- function() {
 #' Reverses [activate()] for the current session. Does not unload an
 #' already-loaded `curl`; restart R for a clean revert.
 #' @return `TRUE` invisibly.
+#' @examples
+#' \dontrun{
+#'   activate()
+#'   library(curl)
+#'   # ... make impersonated requests ...
+#'   deactivate()  # remove the private library; restart R for a fully clean state
+#' }
 #' @export
 deactivate <- function() {
   rlib <- normalizePath(.rlib_dir(), winslash = "/", mustWork = FALSE)
