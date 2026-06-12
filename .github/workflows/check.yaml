@@ -64,6 +64,17 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
 
+      # macOS: tools::R_user_dir() resolves to "~/Library/Application Support/..."
+      # which contains a space that breaks CURL_LIBS shell-flag parsing.
+      - name: Set space-free R user data dir (macOS)
+        if: runner.os == 'macOS'
+        run: echo "R_USER_DATA_DIR=/tmp/r-user-data" >> $GITHUB_ENV
+
+      # Linux: the lexiforest archive ships no headers; install the system ones.
+      - name: Install curl development headers (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y libcurl4-openssl-dev
+
       # Rebuild path: download libcurl-impersonate, rebuild curl, and confirm the
       # server-seen fingerprint changes across all profiles (test-integration.R).
       - name: Rebuild path — integration tests across all profiles
